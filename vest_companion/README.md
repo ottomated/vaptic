@@ -1,16 +1,11 @@
-# vest_companion
+# Vaptic: Companion
 
-Mobile companion app for haptic vest
+Talks to vaptic over bluetooth.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Protocol:
+- Vaptic enters pairing mode via button (clears saved key)
+- App sends shared key via BLE write
+- Vaptic rejects or accepts key and link is established
+- Vaptic returns device details via BLE read
+- App writes vibration matrix via BLE
+- Vaptic notifies on device info update
