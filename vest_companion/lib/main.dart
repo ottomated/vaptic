@@ -8,9 +8,14 @@ import 'splash.dart';
 const String serviceUuid = '80000000-8000-8000-8000-766170746963';
 
 Future<bool> writeString(
-    BluetoothCharacteristic characteristic, String string) async {
+  BluetoothCharacteristic characteristic,
+  String string,
+) async {
   try {
-    await characteristic.write(utf8.encode(string).toList());
+    await characteristic.write(
+      utf8.encode(string).toList(),
+      withoutResponse: false,
+    );
     return true;
   } catch (e) {
     print('Error while writing "$string": ${e.message}');
@@ -40,17 +45,33 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Set<BluetoothDevice> devices = Set();
-  bool scanning = false;
+  BluetoothDevice device;
   FlutterBlue bluetooth = FlutterBlue.instance;
-  BluetoothService service;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Vest Companion'),
+        title: Text('Vaptic'),
         centerTitle: true,
+      ),
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Icon(
+              IconData(0xe82c, fontFamily: 'Icons'),
+              size: 256,
+            ),
+          ],
+        ),
       ),
     );
   }

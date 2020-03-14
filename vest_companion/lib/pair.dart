@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 import 'package:vest_companion/main.dart';
 
 import 'splash.dart';
@@ -19,6 +21,7 @@ class _PairPageState extends State<PairPage> {
   FlutterBlue bluetooth;
   StreamSubscription scanSubscription;
   bool _scanning = false;
+  var _uuid = Uuid();
 
   @override
   void initState() {
@@ -57,7 +60,7 @@ class _PairPageState extends State<PairPage> {
       await device.disconnect();
     }
     scanSubscription = bluetooth.scan().listen((ScanResult scanResult) async {
-      if (scanResult.device.name == 'Vaptic') {
+      if (scanResult.device.name != '') {
         setState(() {
           devices.add(scanResult.device);
         });
@@ -66,6 +69,7 @@ class _PairPageState extends State<PairPage> {
     await Future.delayed(Duration(seconds: 10));
     await bluetooth.stopScan();
     await scanSubscription.cancel();
+    if (!mounted) return;
     setState(() {
       _scanning = false;
     });
@@ -110,7 +114,10 @@ class _PairPageState extends State<PairPage> {
                 for (var device in await bluetooth.connectedDevices) {
                   await device.disconnect();
                 }
-                await device.connect();
+                await device.connect().timeout(
+                      Duration(seconds: 3),
+                      onTimeout: () => throw Exception("Connection timed out!"),
+                    );
                 var service = (await device.discoverServices()).firstWhere(
                   (s) => s.uuid.toString() == serviceUuid,
                   orElse: () => null,
@@ -125,8 +132,26 @@ class _PairPageState extends State<PairPage> {
                 if (characteristic == null) {
                   throw Exception("Device is not a Vaptic! (0x01)");
                 }
-                writeString(characteristic, "Hello, Vaptic.");
+                // Generate shared key
+                var key = _uuid.v4();
+                var authResult = await writeString(
+                    characteristic, json.encode(['auth', key]));
+                if (authResult) {
+                  var prefs = await SharedPreferences.getInstance();
+                  prefs.setString('vapticId', device.id.id);
+                  prefs.setString('vapticKey', key);
+                } else {
+                  throw Exception(
+                    "Vaptic is already paired to another device!",
+                  );
+                }
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ),
+                );
               } catch (e) {
+                device.disconnect();
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(

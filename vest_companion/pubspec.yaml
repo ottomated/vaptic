@@ -12,6 +12,7 @@ dependencies:
   flutter_blue: ^0.6.3
   cupertino_icons: ^0.1.2
   shared_preferences: ^0.5.6
+  uuid: ^2.0.4
 
 dev_dependencies:
   flutter_test:
@@ -19,3 +20,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Icons
+      fonts:
+        - asset: assets/Icons.ttf
