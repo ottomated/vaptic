@@ -118,24 +118,14 @@ class _PairPageState extends State<PairPage> {
                       Duration(seconds: 3),
                       onTimeout: () => throw Exception("Connection timed out!"),
                     );
-                var service = (await device.discoverServices()).firstWhere(
-                  (s) => s.uuid.toString() == serviceUuid,
-                  orElse: () => null,
-                );
-                if (service == null) {
-                  throw Exception("Device is not a Vaptic! (0x00)");
-                }
-                var characteristic = service.characteristics.firstWhere(
-                  (s) => s.uuid.toString() == serviceUuid,
-                  orElse: () => null,
-                );
-                if (characteristic == null) {
-                  throw Exception("Device is not a Vaptic! (0x01)");
-                }
+                var characteristic = await findCharacteristic(device);
+                print(characteristic);
                 // Generate shared key
                 var key = _uuid.v4();
-                var authResult = await writeString(
-                    characteristic, json.encode(['auth', key]));
+                var authResult = await writeToDevice(
+                  characteristic,
+                  ['auth', key],
+                );
                 if (authResult) {
                   var prefs = await SharedPreferences.getInstance();
                   prefs.setString('vapticId', device.id.id);
@@ -147,7 +137,8 @@ class _PairPageState extends State<PairPage> {
                 }
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => HomePage(),
+                    builder: (context) => HomePage(
+                        id: device.id.id, authKey: key, device: device),
                   ),
                 );
               } catch (e) {

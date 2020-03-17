@@ -22,7 +22,10 @@ class SplashPageState extends State<SplashPage> {
         if (prefs.containsKey('vapticId')) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => HomePage(),
+              builder: (context) => HomePage(
+                id: prefs.getString('vapticId'),
+                authKey: prefs.getString('vapticKey'),
+              ),
             ),
           );
         }
@@ -112,13 +115,7 @@ class SplashPageState extends State<SplashPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              "V",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 128,
-              ),
-            ),
+            Image.asset('assets/icon.png'),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,

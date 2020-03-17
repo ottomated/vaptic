@@ -13,6 +13,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   shared_preferences: ^0.5.6
   uuid: ^2.0.4
+  flutter_svg: ^0.17.3
 
 dev_dependencies:
   flutter_test:
@@ -24,3 +25,6 @@ flutter:
     - family: Icons
       fonts:
         - asset: assets/Icons.ttf
+  assets:
+    - assets/Vest.svg
+    - assets/icon.png
